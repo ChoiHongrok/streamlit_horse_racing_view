@@ -210,8 +210,9 @@ with tab1:
     feat = col11.selectbox('변수', sorted(df.columns), key='feat1')
     value = col22.text_input('값(value)', key='value1')
     
-    feat2 = col11.selectbox('변수', sorted(df.columns), key='feat2')
-    value2 = col22.text_input('값(value)', key='value2')
+    col111, col222 = st.columns(2)
+    feat2 = col111.selectbox('변수', sorted(df.columns), key='feat2')
+    value2 = col222.text_input('값(value)', key='value2')
     
     df_selected = df[selected_cols].query('meet == @meet')
     if horse_name:
