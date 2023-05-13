@@ -84,7 +84,7 @@ with st.expander('경주성적표 용어해설'):
     대부분 별정B형으로 가고 능력마들게임은 별정A형으로 가는 경향이 있습니다....부중을 더 주는 것은 좀 그렇죠...능력마가 많지 않기 때문...
     ''')
 
-main_cols = ['meet', 'rcDate', 'rcDay', 'rcDist', 'rcNo', 'weather', 'chulNo', 'age', 'sex', 'hrName']
+main_cols = ['meet', 'rcDate', 'rcDay', 'rcDist', 'rcNo', 'weather', 'chulNo', 'age', 'sex', 'hrName', 'ord']
 sel_type = st.radio('choose your selection type', (1, 2), horizontal=True)
 selected_cols = []
 
