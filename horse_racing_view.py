@@ -34,7 +34,57 @@ df = df[col_all]
 
 col2name = joblib.load('./data/racing_record_col2name.dict')
 
-tab0, tab1, tab2 = st.tabs(['경주성적표 용어해설', 'DataFrame', 'Groupby'])
+tab0, feat_info, tab1, tab2 = st.tabs(['경주성적표 용어해설', '변수설명', 'DataFrame', 'Groupby'])
+with feat_info:
+    st.markdown('''
+- age:\t	연령
+- birthday:\t	생년월일
+- chulNo:\t	출전번호
+- diffUnit:\t	착차
+- g2f:\t	G2F(부경)
+- g3f_4c\t	G3F(부경)_4C(서울,제주)
+- g4f_3c:\t	G4F(부경)_3C(서울,제주)
+- g6f_2c:\t	G6F(부경)_2C(서울,제주)
+- g8f_1c:\t	G8F(부경)_1C(서울,제주)
+- hrName:\t	마명
+- hrNo:\t	마번
+- hrTool:\t	장구내역
+- jkName:\t	기수명
+- jkNo:\t	기수번호
+- meet:\t	경마장명
+- name:\t	마필생산국가
+- ord:\t	순위
+- ordBigo:\t	순위비고
+- ordG1f:\t	G1F순위
+- ordS1f:\t	S1F순위
+- owName:\t	마주명
+- owNo:\t	마주번호
+- plcOdds:\t	복승식 배당율
+- rankRise:\t	승군순위
+- rating:\t	레이팅
+- rcDate:\t	경주일자
+- rcDay:\t	경주요일
+- rcNo:\t	경주번호
+- rcTime:\t	경주기록
+- rcTimeG1f:\t	G1F기록
+- rcTimeG2f:\t	G2F기록(부경)
+- rcTimeG3f:\t	G3F기록
+- rcTimeS1f:\t	S1F기록
+- rcTime_1c: \t 1C 기록
+- rcTime_2c:\t	2C 기록
+- rcTime_3c:\t	3C 기록
+- rcTime_400:\t	400기록부경)
+- rcTime_4c:\t	4C 기록
+- sex:\t	성별
+- trName:\t	조교사명
+- trNo:\t	조교사번호
+- wgBudam:\t	부담중량
+- wgBudamBigo:\t	부담중량증량신청표기
+- wgHr:\t	마체감량
+- wgJk:\t	기수감량
+- winOdds:\t	단승식배당율''')
+    
+    
 with tab0:
     st.markdown('''
         `펄롱타임` : 1펄롱(200m)을 주파한 기록
