@@ -1,4 +1,5 @@
 import joblib
+import numpy as np
 import pandas as pd
 import streamlit as st
 
@@ -6,6 +7,7 @@ import streamlit as st
 def load():
     df_path = './data/racing_df_2017_20230514.csv'
     df = pd.read_csv(df_path, encoding='cp949')
+    df['rcDist_per_time'] = df['rcDist'] / df['rcTime']
     return df
 
 st.title('Horse racing Record')
@@ -19,7 +21,7 @@ horse = ['hrName', 'chulNo', 'hrNo', 'hrTool', 'age', 'birthday', 'sex', 'rating
 game_info = ['weather', 'meet', 'rcDate', 'rcDay', 'ilsu', 'rcDist', 'rcName', 'rcNo', 
              'ageCond', 'prizeCond', 'rank', 'budam', 'track' ]
 time_info = ['rcTime', 'rcTimeG1f', 'rcTimeG2f', 'rcTimeG3f', 'rcTime_1c', 'rcTime_2c', 'rcTime_3c', 'rcTime_400',
-             'rcTime_4c', 'rcTimeS1f', 'diffUnit', ]
+             'rcTime_4c', 'rcTimeS1f', 'diffUnit', 'rcDist_per_time']
 weight = ['wgBudam', 'wgBudamBigo', 'wgHr', 'wgJk']
 rank_info = ['ordBigo', 'ord', 'ordG1f', 'g2f', 'g3f_4c', 'g4f_3c', 'ordS1f', 'g6f_2c', 'g8f_1c']
 prize = ['chaksun1', 'chaksun2', 'chaksun3', 'chaksun4', 'chaksun5', 'buga1', 'buga2', 'buga3',]
@@ -163,19 +165,6 @@ with tab1:
                         
             selected = [col for col, select in selection.items() if select == True]
             selected_cols.extend(selected)
-        # with st.expander(f'변수 선택({n_cols}개)'):
-        #     all_check = st.checkbox('전체선택', value=1)
-        #     n_st_cols = 4
-        #     st_cols = st.columns(n_st_cols)
-            
-        #     selection = {}
-        #     for i, col in enumerate(df.columns):
-        #         st_idx = i // round(n_cols/n_st_cols)# // round(63/5) = 13
-        #         with st_cols[st_idx]:
-        #             init_value = 1 if all_check else 0
-        #             selection[col] = st.checkbox(f'{col} ({col2name.get(col)})', value=init_value)
-                        
-        #     selected = [col for col, select in selection.items() if select == True]
 
     elif sel_type == 2:
         ## type 2
@@ -207,12 +196,12 @@ with tab1:
     
     st.write('Filetering')
     col11, col22 = st.columns(2)
-    feat = col11.selectbox('변수', sorted(df.columns), key='feat1')
-    value = col22.text_input('값(value)', key='value1')
+    feat = col11.selectbox('변수1', sorted(df.columns), key='feat1')
+    value = col22.text_input('값1(value)', key='value1')
     
     col111, col222 = st.columns(2)
-    feat2 = col111.selectbox('변수', sorted(df.columns), key='feat2')
-    value2 = col222.text_input('값(value)', key='value2')
+    feat2 = col111.selectbox('변수2', sorted(df.columns), key='feat2')
+    value2 = col222.text_input('값2(value)', key='value2')
     
     df_selected = df[selected_cols].query('meet == @meet')
     if horse_name:
@@ -242,11 +231,11 @@ with tab2:
     
     st.write('Filetering')
     col11, col22 = st.columns(2)
-    feat = col11.selectbox('변수', sorted(df.columns), key='feat11')
-    value = col22.text_input('값(value)', key='value11')
+    feat = col11.selectbox('변수1', sorted(df.columns), key='feat11')
+    value = col22.text_input('값1(value)', key='value11')
     
-    feat2 = col11.selectbox('변수', sorted(df.columns), key='feat22')
-    value2 = col22.text_input('값(value)', key='value22')
+    feat2 = col11.selectbox('변수2', sorted(df.columns), key='feat22')
+    value2 = col22.text_input('값2(value)', key='value22')
     
     
     df_selected = df.query('meet == @meet')
@@ -296,10 +285,10 @@ with tab3:
     
     hrNames = df_selected.hrName.unique()
 
-    default = [col for col in df.columns if col[0] == 'g' or col[:3] == 'ord' or col[:6] == 'rcTime']+['rcDist', 'hrName', 'age']
+    default = [col for col in df.columns if col[0] == 'g' or col[:3] == 'ord' or col[:6] == 'rcTime']+['rcDist', 'hrName', 'age', 'rcDist_per_time']
     target_col = st.multiselect('Groupby로 확인할 변수를 골라주세요 \n\n ex) ord(등수), wgHr(말무게)',
                               sorted(df.columns), default)
     button2 = st.button('Show Groupby')
     if button2:
-        ret_df = df.query('hrName in @hrNames').groupby('hrName')[sorted(target_col)].mean().sort_values('ord')
+        ret_df = df.query('hrName in @hrNames and rcDate < @date').groupby('hrName')[sorted(target_col)].agg(lambda x: x.replace(np.inf, np.nan).mean(skipna=True)).sort_values('ord')
         st.dataframe(ret_df)
