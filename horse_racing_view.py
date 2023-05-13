@@ -34,128 +34,193 @@ df = df[col_all]
 
 col2name = joblib.load('./data/racing_record_col2name.dict')
 
+tab0, tab1, tab2 = st.tabs(['경주성적표 용어해설', 'DataFrame', 'Groupby'])
+with tab0:
+    st.markdown('''
+        `펄롱타임` : 1펄롱(200m)을 주파한 기록
 
-n_cols = len(df.columns)
-with st.expander('경주성적표 용어해설'):
-    st.text('''
-    펄롱타임 : 1펄롱(200m)을 주파한 기록
+        `통과거리` : 말이 달린 거리
 
-    통과거리 : 말이 달린 거리
+        `통과타임`
 
-    통과타임
+        - 선두마가 통과거리를 지날 때의 주파기록
+        - 1F 간격으로 역산하며 마지막 기록은 그 경주의 1위마의 우승기록
+        구간별 통과순위 : 각 말의 주행을 검토하는 기초자료로 각 코너 통과시의 말 위치
 
-    - 선두마가 통과거리를 지날 때의 주파기록
-    - 1F 간격으로 역산하며 마지막 기록은 그 경주의 1위마의 우승기록
-    구간별 통과순위 : 각 말의 주행을 검토하는 기초자료로 각 코너 통과시의 말 위치
+        - S1F : 출발지점에서 200m 지점
+        - 1C : 1코너로 결승선 전 1,680m지점
+        - 2C : 2코너로 결승선 전 1,400m지점
+        - 3C : 3코너로 결승선 전 810m지점
+        - G3F : 결승선 전 600m지점
+        - 4C : 4코너로 결승선 전 530m지점
+        - G1F : 결승선 전 200m지점
+        - `표기방법`
+        * (1,2,3)은 1마신 미만의 마군표시. ( )내의 내측의 마필부터 표시
+        * (1,^2,3)중 ^표시 마번은 선두집단의 표시
+        * 1,2,3은 선행마로부터 1마신이상 2마신미만의 차이 표시
+        * 1-2-3은 선행마로부터 2마신이상 5마신미만의 차이 표시
+        * 1=2=3은 선행마로부터 5마신이상 10마신미만의 차이 표시
+        * 1≡2≡3은 선행마로부터 10마신아상 대차
+        * 3은 주행중시 표시
+        통과 누적기록 : 각 코너 통과시의 선두말 통과 누적기록
 
-    - S1F : 출발지점에서 200m 지점
-    - 1C : 1코너로 결승선 전 1,680m지점
-    - 2C : 2코너로 결승선 전 1,400m지점
-    - 3C : 3코너로 결승선 전 810m지점
-    - G3F : 결승선 전 600m지점
-    - 4C : 4코너로 결승선 전 530m지점
-    - G1F : 결승선 전 200m지점
-    - 표기방법
-    * (1,2,3)은 1마신 미만의 마군표시. ( )내의 내측의 마필부터 표시
-    * (1,^2,3)중 ^표시 마번은 선두집단의 표시
-    * 1,2,3은 선행마로부터 1마신이상 2마신미만의 차이 표시
-    * 1-2-3은 선행마로부터 2마신이상 5마신미만의 차이 표시
-    * 1=2=3은 선행마로부터 5마신이상 10마신미만의 차이 표시
-    * 1≡2≡3은 선행마로부터 10마신아상 대차
-    * 3은 주행중시 표시
-    통과 누적기록 : 각 코너 통과시의 선두말 통과 누적기록
+        - `S1F지점` : 출발지점에서 200m 지점까지의 통과 기록
+        - 1코너(1C)지점 : 출발지점에서 1코너(결승선 전 1,680m지점)까지의 통과 누적기록
+        - 2코너(2C)지점 : 출발지점에서 2코너(결승선 전 1,400m지점)까지의 통과 누적기록
+        - 3코너(3C)지점 : 출발지점에서 3코너(결승선 전 810m지점)까지의 통과 누적기록
+        - G3F지점 : 결승선 전 600m지점으로, 출발지점에서 결승선 전 600m지점까지의 통과 누적기록
+        - 4코너(4C)지점 : 결승선 전 530m지점으로, 출발지점에서 결승선 전 530m지점까지의 통과 누적기록
+        - G1F지점 : 결승선 전 200m지점으로, 출발지점에서 결승선 전 200m지점까지의 통과 누적기록
+        `펄롱타임` : 결승선 전 마지막 주파기록
 
-    - S1F지점 : 출발지점에서 200m 지점까지의 통과 기록
-    - 1코너(1C)지점 : 출발지점에서 1코너(결승선 전 1,680m지점)까지의 통과 누적기록
-    - 2코너(2C)지점 : 출발지점에서 2코너(결승선 전 1,400m지점)까지의 통과 누적기록
-    - 3코너(3C)지점 : 출발지점에서 3코너(결승선 전 810m지점)까지의 통과 누적기록
-    - G3F지점 : 결승선 전 600m지점으로, 출발지점에서 결승선 전 600m지점까지의 통과 누적기록
-    - 4코너(4C)지점 : 결승선 전 530m지점으로, 출발지점에서 결승선 전 530m지점까지의 통과 누적기록
-    - G1F지점 : 결승선 전 200m지점으로, 출발지점에서 결승선 전 200m지점까지의 통과 누적기록
-    펄롱타임 : 결승선 전 마지막 주파기록
-
-    - 3F-G : 결승선 전 600m지점부터 결승선까지의 기록
-    - 1F-G : 결승선 전 200m지점부터 결승선까지의 기록
+        - 3F-G : 결승선 전 600m지점부터 결승선까지의 기록
+        - 1F-G : 결승선 전 200m지점부터 결승선까지의 기록
+        
+        - `budam변수 별정?`
+        상금많은 말은 부중을 더 주는게 별정A형, 
+        상금적은말은 부중을 덜어주는게 별정B형, 
+        상금많은 말은 부중을 올리고 상금적은 말은 부중을 내려주는게 별정C형. 
+        대부분 별정B형으로 가고 능력마들게임은 별정A형으로 가는 경향이 있습니다....부중을 더 주는 것은 좀 그렇죠...능력마가 많지 않기 때문...
+        ''')
     
-    - budam변수 별정?
-    상금많은 말은 부중을 더 주는게 별정A형, 
-    상금적은말은 부중을 덜어주는게 별정B형, 
-    상금많은 말은 부중을 올리고 상금적은 말은 부중을 내려주는게 별정C형. 
-    대부분 별정B형으로 가고 능력마들게임은 별정A형으로 가는 경향이 있습니다....부중을 더 주는 것은 좀 그렇죠...능력마가 많지 않기 때문...
-    ''')
+with tab1:
+    st.markdown('## DataFrame')
+    n_cols = len(df.columns)
 
-main_cols = ['meet', 'rcDate', 'rcDay', 'rcDist', 'rcNo', 'weather', 'chulNo', 'age', 'sex', 'hrName', 'ord']
-sel_type = st.radio('choose your selection type', (1, 2), horizontal=True)
-selected_cols = []
-
-if sel_type == 1:
-    # type 1
-    for type_name, col_type in col_types.items():
-        n_col_type = len(col_type)
-        with st.expander(f'변수 선택: {type_name}({n_col_type}개)'):
-            all_check = st.checkbox('전체선택', value=0, key=f'전체선택_{type_name}')
-            n_st_cols = 5
-            st_cols = st.columns(n_st_cols)
-            
-            selection = {}
-            for i, col in enumerate(col_type):
-                st_idx = i // (int(n_col_type/n_st_cols) + 1)# // round(63/5) = 13 // round(13/5) = 3 // round(8/5) = 2개 // round(5 / 5) = 1
-                with st_cols[st_idx]:
-                    init_value = 1 if col in main_cols else 0
-                    init_value = 1 if all_check else init_value
-                    selection[col] = st.checkbox(f'{col} ({col2name.get(col)})', value=init_value)
-                    
-        selected = [col for col, select in selection.items() if select == True]
-        selected_cols.extend(selected)
-    # with st.expander(f'변수 선택({n_cols}개)'):
-    #     all_check = st.checkbox('전체선택', value=1)
-    #     n_st_cols = 4
-    #     st_cols = st.columns(n_st_cols)
         
-    #     selection = {}
-    #     for i, col in enumerate(df.columns):
-    #         st_idx = i // round(n_cols/n_st_cols)# // round(63/5) = 13
-    #         with st_cols[st_idx]:
-    #             init_value = 1 if all_check else 0
-    #             selection[col] = st.checkbox(f'{col} ({col2name.get(col)})', value=init_value)
-                    
-    #     selected = [col for col, select in selection.items() if select == True]
 
-elif sel_type == 2:
-    ## type 2
-    for type_name, col_type in col_types.items():
-        n_col_type = len(col_type)
-        with st.expander(f'변수 선택: {type_name}({n_col_type}개)'):
-            container = st.container()
+    main_cols = ['meet', 'rcDate', 'rcDay', 'rcDist', 'rcNo', 'weather', 'chulNo', 'age', 'sex', 'hrName', 'ord']
+    st.info('- 확인하고 싶은 변수와 말이름, 기간 등을 입력하시면 데이터를 확인하실 수 있습니다.(공란가능)')
+    sel_type = st.radio('choose your selection type', (1, 2), horizontal=True)
+    selected_cols = []
 
-            all = st.checkbox("Select all", value=0, key=f'전체선택_{type_name}')
-        
-            cols = [f'{col} ({col2name.get(col)})' for col in col_type]
-            
-            if all:
-                selected = container.multiselect("Select one or more options:",
-                    list(cols), list(cols))
-            else:
-                selected =  container.multiselect("Select one or more options:",
-                    list(cols), [col for col in cols if col.split()[0] in main_cols])
-            selected = [col.split()[0] for col in selected]
+    if sel_type == 1:
+        # type 1
+        for type_name, col_type in col_types.items():
+            n_col_type = len(col_type)
+            with st.expander(f'변수 선택: {type_name}({n_col_type}개)'):
+                all_check = st.checkbox('전체선택', value=0, key=f'전체선택_{type_name}')
+                n_st_cols = 5
+                st_cols = st.columns(n_st_cols)
+                
+                selection = {}
+                for i, col in enumerate(col_type):
+                    st_idx = i // (int(n_col_type/n_st_cols) + 1)# // round(63/5) = 13 // round(13/5) = 3 // round(8/5) = 2개 // round(5 / 5) = 1
+                    with st_cols[st_idx]:
+                        init_value = 1 if col in main_cols else 0
+                        init_value = 1 if all_check else init_value
+                        selection[col] = st.checkbox(f'{col} ({col2name.get(col)})', value=init_value)
+                        
+            selected = [col for col, select in selection.items() if select == True]
             selected_cols.extend(selected)
+        # with st.expander(f'변수 선택({n_cols}개)'):
+        #     all_check = st.checkbox('전체선택', value=1)
+        #     n_st_cols = 4
+        #     st_cols = st.columns(n_st_cols)
+            
+        #     selection = {}
+        #     for i, col in enumerate(df.columns):
+        #         st_idx = i // round(n_cols/n_st_cols)# // round(63/5) = 13
+        #         with st_cols[st_idx]:
+        #             init_value = 1 if all_check else 0
+        #             selection[col] = st.checkbox(f'{col} ({col2name.get(col)})', value=init_value)
+                        
+        #     selected = [col for col, select in selection.items() if select == True]
 
-horse_name = st.text_input('horse name:')
+    elif sel_type == 2:
+        ## type 2
+        for type_name, col_type in col_types.items():
+            n_col_type = len(col_type)
+            with st.expander(f'변수 선택: {type_name}({n_col_type}개)'):
+                container = st.container()
 
-col1, col2 = st.columns(2)
-from_date = col1.text_input('Date(from):\n\n(format=yyyymmdd, yyyymm, yyyy)')
-to_date = col2.text_input('Date(to):\n\n(format=yyyymmdd, yyyymm, yyyy) ')
+                all = st.checkbox("Select all", value=0, key=f'전체선택_{type_name}')
+            
+                cols = [f'{col} ({col2name.get(col)})' for col in col_type]
+                
+                if all:
+                    selected = container.multiselect("Select one or more options:",
+                        list(cols), list(cols))
+                else:
+                    selected =  container.multiselect("Select one or more options:",
+                        list(cols), [col for col in cols if col.split()[0] in main_cols])
+                selected = [col.split()[0] for col in selected]
+                selected_cols.extend(selected)
 
-df_selected = df[selected_cols]
-if horse_name:
-    df_selected = df_selected.query('hrName == @horse_name')
-if from_date:
-    df_selected = df_selected.query('rcDate >= @from_date')
+    meet = st.selectbox('지역을 골라주세요', df.meet.unique(), key='meet')
+    horse_name = st.text_input('horse name:')
 
-if to_date:
-    df_selected = df_selected.query('rcDate <= @to_date')
+    col1, col2 = st.columns(2)
+    from_date = col1.text_input('Date(from):\n\n(format=yyyymmdd, yyyymm, yyyy)')
+    to_date = col2.text_input('Date(to):\n\n(format=yyyymmdd, yyyymm, yyyy) ')
     
-st.write('DataFrame')
-st.info('* rcNo: 주로 \n * ord: 최종순위 \n\n 자세한 칼럼들은 위의 변수선택에서 확인가능합니다!')
-st.dataframe(data=df_selected, width=90000)
+    
+    st.write('Filetering')
+    col11, col22 = st.columns(2)
+    feat = col11.selectbox('변수', sorted(df.columns), key='feat1')
+    value = col22.text_input('값(value)', key='value1')
+    
+    feat2 = col11.selectbox('변수', sorted(df.columns), key='feat2')
+    value2 = col22.text_input('값(value)', key='value2')
+    
+    df_selected = df[selected_cols].query('meet == @meet')
+    if horse_name:
+        df_selected = df_selected.query('hrName == @horse_name')
+    if from_date:
+        df_selected = df_selected.query('rcDate >= @from_date')
+
+    if to_date:
+        df_selected = df_selected.query('rcDate <= @to_date')
+    
+    if value:
+        df_selected = df_selected.query(f'{feat} == {value}', key='value')
+
+    if value2:
+        df_selected = df_selected.query(f'{feat2} == {value2}', key='value2')
+        
+    st.info('* rcNo: 주로 \n * ord: 최종순위 \n\n 자세한 칼럼들은 위의 변수선택에서 확인가능합니다!')
+    st.dataframe(data=df_selected, width=90000)
+
+with tab2:
+    st.markdown('## Group By')
+    st.info('- 아래의 정보를 입력해주시면 해당 경기에 출전한 말들에 대한 **시계열 정보**를 확인하실 수 있습니다(택일) \n 1) 말이름(horse name) \n\n 2) 날짜(date)와 경기번호(rcNo)')
+    meet = st.selectbox('지역을 골라주세요', df.meet.unique())
+    horse_name = st.text_input('horse name:', key='name')
+    date = st.text_input('Date:\n\n(format=yyyymmdd, yyyymm, yyyy) ', key='date')
+    rc_no = st.text_input('rcNo(레이스 번호):', key='rcNo')
+    
+    st.write('Filetering')
+    col11, col22 = st.columns(2)
+    feat = col11.selectbox('변수', sorted(df.columns), key='feat11')
+    value = col22.text_input('값(value)', key='value11')
+    
+    feat2 = col11.selectbox('변수', sorted(df.columns), key='feat22')
+    value2 = col22.text_input('값(value)', key='value22')
+    
+    
+    df_selected = df.query('meet == @meet')
+    if horse_name:
+        df_selected = df_selected.query('hrName == @horse_name')
+    if date:
+        df_selected = df_selected.query('rcDate == @date')
+    if rc_no:
+        rc_no = int(rc_no)
+        df_selected = df_selected.query('rcNo == @rc_no')
+    hrNos = df_selected.hrNo.unique()
+
+    target_col = st.selectbox('groupby로 확인할 변수를 골라주세요 \n\n ex) ord(등수), wgHr(말무게)',
+                              sorted(df.columns) )
+    
+
+    
+    if value:
+        df_selected = df_selected.query(f'{feat} == {value}', key='value')
+
+    if value2:
+        df_selected = df_selected.query(f'{feat2} == {value2}', key='value2')
+        
+    button = st.button('Show Groupby')
+    if button:
+        groupby = df.query('hrNo in @hrNos').pivot_table(index='hrName', columns='rcDate', values= target_col, fill_value='-', aggfunc=sum)#.T.reset_index().T
+        groupby = groupby[sorted(groupby.columns, reverse=True)]
+        st.dataframe(data=groupby, width=90000)
