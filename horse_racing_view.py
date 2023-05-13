@@ -285,7 +285,7 @@ with tab3:
     
     hrNames = df_selected.hrName.unique()
 
-    default = ['rcDist', 'hrName', 'age', 'ord', 'rcDist_per_time', 'rcDist','rcTimeS1f', 'ordS1f']
+    default = ['rcDist', 'hrName', 'age', 'ord', 'rcDist_per_time','rcTimeS1f', 'ordS1f']
     target_col = st.multiselect('Groupby로 확인할 변수를 골라주세요 \n\n ex) ord(등수), wgHr(말무게)',
                               sorted(df.columns), default)
     button2 = st.button('Show Groupby')
