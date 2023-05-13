@@ -157,4 +157,5 @@ if to_date:
     df_selected = df_selected.query('rcDate <= @to_date')
     
 st.write('DataFrame')
+st.info('* rcNo: 주로 \n * ord: 최종순위 \n\n 자세한 칼럼들은 위의 변수선택에서 확인가능합니다!')
 st.dataframe(data=df_selected, width=90000)
