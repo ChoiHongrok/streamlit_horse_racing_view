@@ -2,11 +2,14 @@ import joblib
 import pandas as pd
 import streamlit as st
 
+@st.cache
+def load():
+    df_path = './data/racing_df_2017_20230514.csv'
+    df = pd.read_csv(df_path, encoding='cp949')
+    return df
 
 st.title('Horse racing Record')
-df_path = './data/racing_df_2017_20230514.csv'
-df = pd.read_csv(df_path, encoding='cp949')
-
+df = load()
 # string colums
 int2str_cols = ['rcDate', 'birthday']
 df[int2str_cols] = df[int2str_cols].astype(str)
