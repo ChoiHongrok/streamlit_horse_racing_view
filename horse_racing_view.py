@@ -34,7 +34,7 @@ df = df[col_all]
 
 col2name = joblib.load('./data/racing_record_col2name.dict')
 
-tab0, feat_info, tab1, tab2 = st.tabs(['경주성적표 용어해설', '변수설명', 'DataFrame', 'Groupby'])
+tab0, feat_info, tab1, tab2, tab3 = st.tabs(['경주성적표 용어해설', '변수설명', 'DataFrame', 'PivotTable', 'Groupby'])
 with feat_info:
     st.markdown('''
 - age:\t	연령
@@ -259,7 +259,7 @@ with tab2:
         df_selected = df_selected.query('rcNo == @rc_no')
     hrNos = df_selected.hrNo.unique()
 
-    target_col = st.selectbox('groupby로 확인할 변수를 골라주세요 \n\n ex) ord(등수), wgHr(말무게)',
+    target_col = st.selectbox('PivotTable로 확인할 변수를 골라주세요 \n\n ex) ord(등수), wgHr(말무게)',
                               sorted(df.columns) )
     
 
@@ -270,8 +270,36 @@ with tab2:
     if value2:
         df_selected = df_selected.query(f'{feat2} == {value2}', key='value2')
         
-    button = st.button('Show Groupby')
+    button = st.button('Show PivotTable')
     if button:
         groupby = df.query('hrNo in @hrNos').pivot_table(index='hrName', columns='rcDate', values= target_col, fill_value='-', aggfunc=sum)#.T.reset_index().T
         groupby = groupby[sorted(groupby.columns, reverse=True)]
         st.dataframe(data=groupby, width=90000)
+
+
+with tab3:
+    st.markdown('## Group By')
+    st.info('- 아래의 정보를 입력해주시면 해당 경기에 출전한 말들에 대한 **시계열 정보**를 확인하실 수 있습니다(택일) \n 1) 말이름(horse name) \n\n 2) 날짜(date)와 경기번호(rcNo)')
+    meet = st.selectbox('지역을 골라주세요', df.meet.unique(), key='meet3')
+    horse_name = st.text_input('horse name:', key='name3')
+    date = st.text_input('Date:\n\n(format=yyyymmdd, yyyymm, yyyy) ', key='date3')
+    rc_no = st.text_input('rcNo(레이스 번호):', key='rcNo3')
+        
+    df_selected = df.query('meet == @meet')
+    if horse_name:
+        df_selected = df_selected.query('hrName == @horse_name')
+    if date:
+        df_selected = df_selected.query('rcDate == @date')
+    if rc_no:
+        rc_no = int(rc_no)
+        df_selected = df_selected.query('rcNo == @rc_no')
+    
+    hrNames = df_selected.hrName.unique()
+
+    default = [col for col in df.columns if col[0] == 'g' or col[:3] == 'ord' or col[:6] == 'rcTime']+['rcDist', 'hrName', 'age']
+    target_col = st.multiselect('Groupby로 확인할 변수를 골라주세요 \n\n ex) ord(등수), wgHr(말무게)',
+                              sorted(df.columns), default)
+    button2 = st.button('Show Groupby')
+    if button2:
+        ret_df = df.query('hrName in @hrNames').groupby('hrName')[sorted(target_col)].mean().sort_values('ord')
+        st.dataframe(ret_df)
