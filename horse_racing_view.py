@@ -2,7 +2,7 @@ import joblib
 import pandas as pd
 import streamlit as st
 
-@st.cache
+@st.cache_data
 def load():
     df_path = './data/racing_df_2017_20230514.csv'
     df = pd.read_csv(df_path, encoding='cp949')
